@@ -26,9 +26,7 @@ namespace HttpSynchronizer
             LocalPath = localPath;
 
             if (!Directory.Exists(localPath))
-            {
                 Directory.CreateDirectory(localPath);
-            }
         }
 
         public void Sync(Action<bool> cb)
@@ -49,25 +47,27 @@ namespace HttpSynchronizer
                         // differences
                         var differences = Differences();
 
-                        // download
-                        using (var downloader = new WebClient())
-                        {
-                            foreach (var path in differences)
+                            // download
+                            using (var downloader = new WebClient())
                             {
-                                var drinfo = new DirectoryInfo(LocalPath + path);
-                                if (!Directory.Exists(drinfo.Parent.FullName))
-                                    Directory.CreateDirectory(drinfo.Parent.FullName);
+                                foreach (var path in differences)
+                                {
+                                    var dir = new DirectoryInfo(LocalPath + path);
+                                    if (!Directory.Exists(dir.Parent.FullName))
+                                        Directory.CreateDirectory(dir.Parent.FullName);
 
-                                try
-                                {
-                                    downloader.DownloadFile(new Uri(Url + path), LocalPath + path);
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine(e.InnerException != null ? e.InnerException.Message : e.Message);
+                                    try
+                                    {
+                                        downloader.DownloadFile(Url + path, LocalPath + path);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Console.WriteLine(e.InnerException != null
+                                            ? e.InnerException.Message
+                                            : e.Message);
+                                    }
                                 }
                             }
-                        }
 
                         cb(true);
                     };
