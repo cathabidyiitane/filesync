@@ -79,7 +79,7 @@ module.exports = function (urls)
                 }
             }
             return false;
-        })) 
+        }) && next && typeof(next) === 'function') 
             next();
     };
 };
